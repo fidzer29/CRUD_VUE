@@ -3,13 +3,13 @@
 <div class="">
   <h1 class="text-center">TUGAS MEMBUAT CRUD PROYEK 3</h1>
   <form @submit.prevent="save">
-    <input type="hidden" v-model="form.id" name="" >
-    <input type="text" class="form-control" placeholder="Input nama" v-model="form.name" name="" ><br>
+    <input type="hidden" v-model="form._id" name="_id" >
+    <input type="text" class="form-control" placeholder="Input nama" v-model="form.ItemName" name="ItemName" ><br>
     <button type="submit" v-show="!updateSubmit" name="button" class="btn btn-primary">Save</button>
     <button type="button" v-show="updateSubmit" v-on:click="update(form)" name="button" class="btn btn-primary">Update</button>
   </form>
 
-<br><h4 class="text-center">LIST USERS</h4></div>
+<br><h4 class="text-center">DATA USERS</h4></div>
 
 <ul v-for="user in users" :key="user.id">
   <table class="table">
@@ -23,11 +23,11 @@
   <tbody>
     <tr>
       <td>
-        <li>{{ user.id }} <br>
+        <li>{{ user._id }} <br>
         </li>
       </td>
       <td>
-        <li>{{ user.name }} <br>
+        <li>{{ user.ItemName }} <br>
         </li>
       </td>
       <td>
@@ -45,13 +45,15 @@
 <script>
 
 import axios from 'axios'
+import swal from 'sweetalert';
 
 export default {
   data(){
     return{
       form:{
-        id: '',
-        name:''
+        _id: '',
+        ItemName:'',
+        __v: ""
       },
       users: [],
       updateSubmit: false
@@ -60,9 +62,10 @@ export default {
 
   methods:{
     load(){
-      axios.get('http://localhost:3000/users')
+      axios.get('http://10.10.131.46:3000/get-all')
       .then((res)=>{
         this.users = res.data
+        // console.log(res.data)
       })
       .catch(()=>{
         alert('eror load data')
@@ -70,44 +73,46 @@ export default {
     },
 
     save(){
-      axios.post('http://localhost:3000/users', this.form)
+      axios.post('http://10.10.131.46:3000/create', this.form)
       .then(()=>{
         this.load()
-        this.form.name = ''
-        alert('saving...')
+        this.form.ItemName = ''
+        swal("Data Tersimpan");
       })
       .catch(()=>{
-        alert('saving error')
+        swal("Data Error");
       })
     },
     edit(user){
       this.updateSubmit = true
-      this.form.id = user.id
-      this.form.name = user.name
+      this.form._id = user._id
+      this.form.ItemName = user.ItemName
     },
     update(form){
-      axios.put('http://localhost:3000/users/' + form.id , {
-        name: this.form.name
+      axios.put('http://10.10.131.46:3000/ItemName/' + form._id , {
+        ItemName: this.form.ItemName
       })
-      .then(()=>{
+      .then((res)=>{
         this.load()
-        this.form.name = ''
+        this.form._id = ''
+        this.form.ItemName = ''
         this.updateSubmit = false
-        alert('updated...')
+        console.log("ini resnya : ",res);
+        swal("Data Update");
       })
       .catch(()=>{
-        alert('error update')
+        swal("Update Error");
       })
     },
     hapus(user){
-      axios.delete('http://localhost:3000/users/' + user.id)
+      axios.delete('http://10.10.131.46:3000/ItemName/' + user._id)
       .then(()=>{
         this.load()
-        this.form.name = ''
-        alert('deleted...')
+        this.form.ItemName = ''
+        swal("Data Terhapus");
       })
       .catch(()=>{
-        alert('deleted error')
+        swal("Data Error");
       })
     }
   },
